@@ -16,6 +16,11 @@ TEXT_MUTED = '#a0a0a0'   # Второстепенный текст
 
 selected_color = ACCENT_PRIMARY
 
+refresh_rate = 2000
+font_family = "Arial" #Unbounded
+font_size = 12
+font_style = (font_family, font_size)
+
 class basicTextAnalyzer:
     def __init__(self):
         ctk.set_appearance_mode("dark")
@@ -40,8 +45,26 @@ class basicTextAnalyzer:
         aside.pack(side="left", fill="y")
 
 # --------------------------------------------------------------------------------------------------------
+        # центральная панель
+        userInput_container = ctk.CTkFrame(main, fg_color="transparent")
+        userInput_container.pack(side="left", fill="both", expand=True)
 
+        def update_padding():
+            width = userInput_container.winfo_width()
+            user_input.configure(padx=int(width * 0.05))
+            self.app.after(refresh_rate, update_padding)
 
+        user_input = ctk.CTkTextbox(userInput_container, fg_color="transparent", font=font_style)
+        user_input.pack(side="left",
+                fill="both",
+                expand=True,
+                pady=5)
+        
+        update_padding()
+        
+
+# --------------------------------------------------------------------------------------------------------
+        # left-aside color
         aside_color_container = ctk.CTkFrame(aside, fg_color=ACCENT_PRIMARY, width=100, height=120)
         aside_color_container.pack(side="bottom")
 
@@ -66,7 +89,7 @@ class basicTextAnalyzer:
         open_colorPicker.pack()
 
 # --------------------------------------------------------------------------------------------------------
-
+        # left-aside style
         aside_style_container = ctk.CTkFrame(aside, fg_color=ACCENT_PRIMARY, width=100, height=120)
         aside_style_container.pack(side="bottom")
 
@@ -91,13 +114,102 @@ class basicTextAnalyzer:
         open_stylePicker.pack()
 
 # --------------------------------------------------------------------------------------------------------
-
-        aside_style_container = ctk.CTkFrame(aside,
+        # left-aside panel
+        left_aside_container = ctk.CTkFrame(aside,
             fg_color=ACCENT_PRIMARY,
             width=100,
             border_width=1,
             border_color=ACCENT_SECONDARY)
-        aside_style_container.pack(side="left", fill="y")
+        left_aside_container.pack(side="left", fill="y")
+
+# --------------------------------------------------------------------------------------------------------
+        # Right-aside panel
+        control_panel = ctk.CTkFrame(main, width=50,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY)
+        control_panel.pack(side="right", fill="y")
+
+        btn1 = ctk.CTkButton(control_panel,
+                text="A",
+                width=40,
+                height=30,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY,
+                hover_color=ACCENT_SECONDARY)
+        btn1.pack(side="top", padx=5, pady=1)
+
+        btn2 = ctk.CTkButton(control_panel,
+                text="B",
+                width=40,
+                height=30,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY,
+                hover_color=ACCENT_SECONDARY)
+        btn2.pack(side="top", padx=5, pady=1)
+
+        btn3 = ctk.CTkButton(control_panel,
+                text="C",
+                width=40,
+                height=30,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY,
+                hover_color=ACCENT_SECONDARY)
+        btn3.pack(side="top", padx=5, pady=1)
+        
+        btn4 = ctk.CTkButton(control_panel,
+                text="D",
+                width=40,
+                height=30,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY,
+                hover_color=ACCENT_SECONDARY)
+        btn4.pack(side="top", padx=5, pady=1)
+
+        btn5 = ctk.CTkButton(control_panel,
+                text="E",
+                width=40,
+                height=30,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY,
+                hover_color=ACCENT_SECONDARY)
+        btn5.pack(side="top", padx=5, pady=1)
+
+        btn6 = ctk.CTkButton(control_panel,
+                text="F",
+                width=40,
+                height=30,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY,
+                hover_color=ACCENT_SECONDARY)
+        btn6.pack(side="top", padx=5, pady=1)
+
+        preferences = ctk.CTkButton(control_panel,
+                text="☰",
+                width=40,
+                height=30,
+                fg_color=ACCENT_PRIMARY,
+                border_width=1,
+                border_color=ACCENT_SECONDARY,
+                hover_color=ACCENT_SECONDARY,
+                )
+        preferences.pack(side="bottom", padx=5, pady=1)
+
+# --------------------------------------------------------------------------------------------------------
+        # плавающее меню
+        self.app_settings = ctk.CTkFrame(main,
+                fg_color=ACCENT_PRIMARY,
+                width=500,
+                height=300,
+                border_width=1,
+                border_color=ACCENT_SECONDARY)
+        self.app_settings.place(relx=1, rely=1, anchor="e", x=-60, y=-160)
 
 
     def run(self):
