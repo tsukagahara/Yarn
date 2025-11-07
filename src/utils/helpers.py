@@ -1,7 +1,7 @@
 import os
 
 
-class helpers_costomize:
+class HelpersCustomize:
     def __init__(self):
         self.themes_dir = 'resources/themes/'
         self.fonts_dir = 'resources/fonts/'
