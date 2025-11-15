@@ -9,10 +9,11 @@ text_editor_noble/
 │   │   ├── main_window.py      # Главное окно
 │   ├── widgets/
 │   │   ├── __init__.py
+│   │   ├── window_resize.py    # Обработчик изменения размера окна
 │   │   ├── header.py      	# Шапка
 │   │   ├── text_editor.py      # Кастомный текстовый редактор
-│   │   ├── left_aside.py
-│   │   └── right_aside.py
+│   │   ├── first_aside.py
+│   │   └── second_aside.py
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── file_manager.py     # Управление файлами

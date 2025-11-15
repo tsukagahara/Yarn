@@ -1,172 +1,159 @@
 import os
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
+import sys
+from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
+                              QLabel, QPushButton, QTextEdit, QListWidget, QApplication)
 from PySide6.QtGui import QIcon, Qt
 from PySide6.QtCore import QRect
+
+from widgets.window_resize import ResizeHandler
 import utils.helpers as helpers
 from widgets.header import CustomHeader
 
 
+def get_project_root():
+    """Определяет корень проекта в dev и exe режимах"""
+    if hasattr(sys, '_MEIPASS'):
+        # EXE режим - все файлы рядом с exe
+        return os.path.dirname(sys.executable)
+    else:
+        # Dev режим - на 3 уровня выше от текущего файла  
+        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.resize_handler = ResizeHandler(self)
+        self.base_path = get_project_root()
         self.setup_main_app()
-        self.path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))).replace('\\', '/')
-        
-        self.resize_margin = 8
-        self.resize_dragging = False
-        self.resize_direction = None
-        self.setMouseTracking(True)
 
-        self.theme_default = helpers.get_json_property(
-            self.path + '/resources/themes/' + 
-            f'{helpers.get_json_property('./config/config.json', "theme")}' + 
-            '.json'
-        )
+        self.config_path = os.path.join(self.base_path, 'config', 'config.json')
+        self.themes_path = os.path.join(self.base_path, 'resources', 'themes')
+        self.fonts_path = os.path.join(self.base_path, 'resources', 'fonts')
 
-        self.font_default = helpers.get_json_property(
-            self.path + '/resources/fonts/' + 
-            f'{helpers.get_json_property('./config/config.json', "fonts")}' + 
-            '.json'
-        )
-        self.main_font_style = self.font_default["main"]
-        self.monospace_font_style = self.font_default["monospace"]
+        self.theme_default = self.load_theme()
+        self.font_default = self.load_font()
 
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
 
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
-
         self.create_widgets()
 
+        self.main_font_style = self.font_default["main"]
+        self.monospace_font_style = self.font_default["monospace"]
         self.is_color_suitable = (self.theme_default["isDark"] == self.main_font_style["fontIsDark"])
         if self.is_color_suitable:
-            dialog = helpers.colors_is_suitable(self.theme_default, self.main_font_style, self.path)
+            dialog = helpers.colors_is_suitable(self.theme_default, self.main_font_style, self.base_path, parent=self)
             dialog.exec()
 
-    def setup_main_app(self):
-        self.setGeometry(100, 100, 400, 300)
-        self.setWindowTitle("Yarn")
-        self.setMinimumSize(200, 150)
+    def mousePressEvent(self, event):
+        if self.resize_handler.mouse_press(event):
+            return
+        super().mousePressEvent(event)
+    
+    def mouseMoveEvent(self, event):
+        if self.resize_handler.mouse_move(event):
+            return  
+        super().mouseMoveEvent(event)
         
-        icon_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                "resources", "icons", "ico", "Yarn-256.ico")
+    def mouseReleaseEvent(self, event):
+        if self.resize_handler.mouse_release(event):
+            return
+        super().mouseReleaseEvent(event)
+
+    def load_theme(self):
+        theme_name = helpers.get_json_property(self.config_path, "theme") or "default"
+        theme_file = os.path.join(self.themes_path, f"{theme_name}.json")
+        return helpers.get_json_property(theme_file) or self.get_fallback_theme()
+
+    def load_font(self):
+        font_name = helpers.get_json_property(self.config_path, "fonts") or "default"  
+        font_file = os.path.join(self.fonts_path, f"{font_name}.json")
+        return helpers.get_json_property(font_file) or self.get_fallback_font()
+
+    def get_fallback_theme(self):
+        return {
+            "isDark": True,
+            "bg_dark": "#111111",
+            "bg_card": "#121212", 
+            "accent_primary": "#202020",
+            "accent_secondary": "#252525",
+            "accent_light": "#7a7a7a",
+            "text_main": "#e0e0e0",
+            "text_muted": "#a0a0a0"
+        }
+
+    def get_fallback_font(self):
+        return {
+            "main": {
+                "family": "Segoe UI",
+                "size": 12,
+                "weight": "normal",
+                "style": "normal", 
+                "line_height": 1.4,
+                "letter_spacing": 0,
+                "color": "#e0e0e0",
+                "fontIsDark": False
+            },
+            "monospace": {
+                "family": "Consolas", 
+                "size": 12,
+                "weight": "normal",
+                "style": "normal",
+                "line_height": 1.2,
+                "letter_spacing": 0,
+                "color": "#e0e0e0"
+            }
+        }
+
+    def setup_main_app(self):
+        screen = QApplication.primaryScreen()
+        geometry = screen.availableGeometry()
+        width, height = 400, 300
+        x = (geometry.width() - width) // 2
+        y = (geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
+        self.setWindowTitle("Yarn")
+        self.setMinimumSize(400, 300)
+        
+        icon_path = os.path.join(self.base_path, "resources", "icons", "ico", "Yarn-256.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
         
         central_widget = QWidget()
-        central_widget.setMouseTracking(True)
         self.setCentralWidget(central_widget)
         self.layout = QVBoxLayout(central_widget)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-    
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            pos = event.position().toPoint()
-            self.resize_direction = self.get_resize_direction(pos)
-            if self.resize_direction:
-                self.resize_dragging = True
-                self.resize_start_pos = event.globalPosition().toPoint()
-                self.resize_start_geometry = self.geometry()
-                return
-                
-        super().mousePressEvent(event)
-    
-    def mouseMoveEvent(self, event):
-        pos = event.position().toPoint()
-        width = self.width()
-        height = self.height()
-        x, y = pos.x(), pos.y()
-        
-        if not self.resize_dragging:
-            new_cursor = Qt.ArrowCursor
-            
-            if x <= 10 and y <= 10:
-                new_cursor = Qt.SizeFDiagCursor
-            elif x >= width - 10 and y <= 10:
-                new_cursor = Qt.SizeBDiagCursor
-            elif x <= 10 and y >= height - 10:
-                new_cursor = Qt.SizeBDiagCursor
-            elif x >= width - 10 and y >= height - 10:
-                new_cursor = Qt.SizeFDiagCursor
-            elif x <= 10:
-                new_cursor = Qt.SizeHorCursor
-            elif x >= width - 10:
-                new_cursor = Qt.SizeHorCursor
-            elif y <= 10:
-                new_cursor = Qt.SizeVerCursor
-            elif y >= height - 10:
-                new_cursor = Qt.SizeVerCursor
-            
-            if self.cursor().shape() != new_cursor:
-                self.unsetCursor()
-                self.setCursor(new_cursor)
-        else:
-            self.handle_resize(event.globalPosition().toPoint())
-            
-        super().mouseMoveEvent(event)
-    
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.resize_dragging = False
-            self.resize_direction = None
-            self.setCursor(Qt.ArrowCursor)
-            
-        super().mouseReleaseEvent(event)
-    
-    def get_resize_direction(self, pos):
-        width = self.width()
-        height = self.height()
-        x, y = pos.x(), pos.y()
-        margin = 10
-        
-        if x <= margin and y <= margin:
-            return 'top_left'
-        elif x >= width - margin and y <= margin:
-            return 'top_right'
-        elif x <= margin and y >= height - margin:
-            return 'bottom_left'
-        elif x >= width - margin and y >= height - margin:
-            return 'bottom_right'
-        elif x <= margin:
-            return 'left'
-        elif x >= width - margin:
-            return 'right'
-        elif y <= margin:
-            return 'top'
-        elif y >= height - margin:
-            return 'bottom'
-        return None
-    
-    def handle_resize(self, global_pos):
-        if not self.resize_dragging or not self.resize_direction:
-            return
-            
-        delta = global_pos - self.resize_start_pos
-        new_geometry = QRect(self.resize_start_geometry)
-        
-        direction = self.resize_direction
-        
-        if 'left' in direction:
-            new_geometry.setLeft(new_geometry.left() + delta.x())
-        if 'right' in direction:
-            new_geometry.setRight(new_geometry.right() + delta.x())
-        if 'top' in direction:
-            new_geometry.setTop(new_geometry.top() + delta.y())
-        if 'bottom' in direction:
-            new_geometry.setBottom(new_geometry.bottom() + delta.y())
-        
-        if new_geometry.width() >= 200 and new_geometry.height() >= 150:
-            self.setGeometry(new_geometry)
+
     
     def create_widgets(self):
-        pass
-        # self.header = CustomHeader(theme=self.theme_default, parent=self)
-        # self.layout.addWidget(self.header)
-        # self.header.close_btn.clicked.connect(self.close)
+        self.header = CustomHeader(theme=self.theme_default, parent=self)
+        self.layout.addWidget(self.header)
+        self.header.close_btn.clicked.connect(self.close)
+
+        main_content = QHBoxLayout()
+    
+        self.block1 = QWidget()
+        self.block2 = QWidget()
+        self.block3 = QWidget()
+
+        self.block1_layout = QVBoxLayout(self.block1)
+        self.block2_layout = QVBoxLayout(self.block2)
+        self.block3_layout = QVBoxLayout(self.block3)
+
+        self.block1_layout.addWidget(QLabel("Блок 1"))
+        self.block1_layout.addWidget(QPushButton("Кнопка 1"))
+
+        self.block2_layout.addWidget(QLabel("Блок 2"))
+        self.block2_layout.addWidget(QTextEdit())
+
+        self.block3_layout.addWidget(QLabel("Блок 3"))
+        self.block3_layout.addWidget(QListWidget())
+
+        main_content.addWidget(self.block1)
+        main_content.addWidget(self.block2)
+        main_content.addWidget(self.block3)
+        
+        self.layout.addLayout(main_content)
     
     def on_close(self):
         self.close()
-    
-    def run(self):
-        self.show()

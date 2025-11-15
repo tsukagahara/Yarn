@@ -1,5 +1,8 @@
 import os
 import json
+from PySide6.QtWidgets import (QDialog, QVBoxLayout,
+                            QLabel, QPushButton, QHBoxLayout)
+from PySide6.QtCore import Qt
 
 def get_json_property(path, preference_name=""):
     try:
@@ -13,21 +16,16 @@ def get_json_property(path, preference_name=""):
         raise ValueError(f"Ошибка парсинга JSON в файле {path}: {e}")
     except Exception as e:
         raise RuntimeError(f"Ошибка при чтении файла {path}: {e}")
-    
-    
-from PySide6.QtWidgets import (QDialog, QVBoxLayout,
-                            QLabel, QPushButton, QHBoxLayout)
-from PySide6.QtCore import Qt
 
 class colors_is_suitable(QDialog):
-    def __init__(self, theme_default, main_font_style, path):
-        super().__init__()
+    def __init__(self, theme_default, main_font_style, base_path, parent=None):
+        super().__init__(parent)
         self.setWindowTitle("Проверка контрасности шрифта на фоне")
         self.setFixedSize(1000, 500)
         self.setModal(True)
         self.theme_default = theme_default
         self.main_font_style = main_font_style
-        self.path = path
+        self.base_path = base_path
 
         self.setup_ui()
 
@@ -39,7 +37,17 @@ class colors_is_suitable(QDialog):
         label_title.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px;")
         layout.addWidget(label_title)
 
-        label_text = QLabel(f'Параметр "isDark" в {self.path + "/resources/themes/" + f'{get_json_property("./config/config.json", "theme")}' + ".json"} равен параметру {'\n'} "fontIsDark" в {self.path + "/resources/themes/" + f'{get_json_property("./config/config.json", "fonts")}' + ".json"}, что означает плохую контрасность текста')
+        config_path = os.path.join(self.base_path, 'config', 'config.json')
+        theme_name = get_json_property(config_path, "theme") or "default"
+        fonts_name = get_json_property(config_path, "fonts") or "default"
+
+        theme_file_path = os.path.join(self.base_path, "resources", "themes", f"{theme_name}.json")
+        fonts_file_path = os.path.join(self.base_path, "resources", "fonts", f"{fonts_name}.json")
+
+        label_text = QLabel(
+            f'Параметр "isDark" в {theme_file_path} равен параметру\n'
+            f'"fontIsDark" в {fonts_file_path}, что означает плохую контрасность текста'
+        )
 
         label_text.setAlignment(Qt.AlignmentFlag.AlignLeft)
         label_text.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px, 2px; margin: 20px;")
