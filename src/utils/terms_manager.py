@@ -7,7 +7,8 @@ from PySide6.QtCore import Qt
 
 class TermsManager:
     def __init__(self):
-        self.config_path = "config/config.json"
+        self.base_path = helpers.get_project_root()
+        self.config_path = os.path.join(self.base_path, "config", "config.json")
         # print(f"Загружаем config из: {self.config_path}")
         
         self.config_data = helpers.get_json_property(f'{self.config_path}')
@@ -56,6 +57,7 @@ class TermsDialog(QDialog):
         self.setWindowTitle("Лицензионное соглашение MIT")
         self.setFixedSize(500, 500)
         self.setModal(True)
+        self.base_path = helpers.get_project_root()
         
         self.setup_ui()
     
@@ -126,12 +128,13 @@ class TermsDialog(QDialog):
 
     def load_license_text(self):
         try:
-            with open("LICENSE", "r", encoding="utf-8") as f:
+            license_path = os.path.join(self.base_path, "LICENSE.txt")
+            with open(license_path, "r", encoding="utf-8") as f:
                 return f.read()
         except FileNotFoundError:
             return """MIT License
 
-Copyright (c) 2024 tsukagahara
+Copyright (c) 2025 tsukagahara
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,5 +1,4 @@
 import os
-import sys
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                               QLabel, QPushButton, QTextEdit, QListWidget, QApplication)
 from PySide6.QtGui import QIcon, Qt
@@ -9,18 +8,11 @@ from widgets.window_resize import ResizeHandler
 import utils.helpers as helpers
 from widgets.header import CustomHeader
 
-
-def get_project_root():
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.dirname(sys.executable)
-    else:
-        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.resize_handler = ResizeHandler(self)
-        self.base_path = get_project_root()
+        self.base_path = helpers.get_project_root()
         self.setup_main_app()
 
         self.config_path = os.path.join(self.base_path, 'config', 'config.json')

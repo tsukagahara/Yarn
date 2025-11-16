@@ -1,8 +1,15 @@
 import os
+import sys
 import json
 from PySide6.QtWidgets import (QDialog, QVBoxLayout,
                             QLabel, QPushButton, QHBoxLayout)
 from PySide6.QtCore import Qt
+
+def get_project_root():
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def get_json_property(path, preference_name=""):
     try:

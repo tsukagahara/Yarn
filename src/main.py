@@ -3,24 +3,26 @@ import os
 from utils.terms_manager import TermsManager
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
+from PySide6.QtGui import QIcon
+import utils.helpers as helpers
 
 class Yarn:
     def __init__(self):
+        self.icon_path = os.path.join(helpers.get_project_root(), "resources", "icons", "ico", "Yarn-256.ico")
         self.app = QApplication(sys.argv)
+        if os.path.exists(self.icon_path):
+            self.app.setWindowIcon(QIcon(self.icon_path))
         self.terms_manager = TermsManager()
         QTimer.singleShot(0, self.check_terms)
 
-    def check_terms(self):
+    def check_terms(self):#, icon_path):
         if not self.terms_manager.search_termsAccepted():
             self.app.quit()
             return
         
         self.launch_main_window()
     
-    def launch_main_window(self):
+    def launch_main_window(self):#, icon_path):
         from app.main_window import MainWindow
         self.main_window = MainWindow()
         self.main_window.show()
