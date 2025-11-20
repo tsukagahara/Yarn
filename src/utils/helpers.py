@@ -7,14 +7,14 @@ from PySide6.QtCore import Qt
 def open_file_dialog(self):
     file_path, _ = QFileDialog.getOpenFileName(
         self, 
-        "Выберите файл",  # заголовок
-        "",  # начальная директория
-        "All Files (*)"  # фильтр файлов
+        "Выберите файл",
+        "",
+        "All Files (*)"
     )
     
     if file_path:
-        file_name = os.path.basename(file_path)  # название файла
-        directory = os.path.dirname(file_path)   # путь к папке
+        file_name = os.path.basename(file_path)
+        directory = os.path.dirname(file_path)
         
         return file_name, directory
     return None, None
@@ -47,6 +47,31 @@ def add_json_property(path, property, value):
             data = json.load(f)
 
         data[property] = value
+
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+        return 'success'
+
+    except FileNotFoundError:
+        return 'error: JSON файл не найден'
+    except json.JSONDecodeError as e:
+        return f'error: Ошибка парсинга JSON: {e}'
+    except Exception as e:
+        return f'error: Ошибка при работе с файлом: {e}'
+    
+def remove_json_property(path, property):
+    try:
+        if not property or not isinstance(property, str):
+            return 'invalid_key_name'
+
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        if property in data:
+            del data[property]
+        else:
+            return 'property_not_found'
 
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)

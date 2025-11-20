@@ -66,11 +66,15 @@ class tabs(QWidget):
         layout.addWidget(self.scroll_area)
 
     def on_add_tab_clicked(self):
+        # add: load file
         file_name, directory = helpers.open_file_dialog(self)
         helpers.add_json_property(self.path_tabs, file_name, directory)
         self.reload_tabs()
 
-    
+    def on_remove_tab_clicked(self, name):
+        # add: save file
+        helpers.remove_json_property(self.path_tabs, name)
+        self.reload_tabs()
         
 
     def reload_tabs(self):
@@ -122,6 +126,7 @@ class tabs(QWidget):
             btn_remove.setCursor(Qt.PointingHandCursor)
             btn_remove.setProperty("class", "tab")
             btn_remove.setFont(QFont("Monospace", 10))
+            btn_remove.clicked.connect(lambda checked, n=name: self.on_remove_tab_clicked(n))
             
             tab_layout.addWidget(btn)
             tab_layout.addWidget(btn_remove)
