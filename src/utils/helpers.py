@@ -46,6 +46,9 @@ def add_json_property(path, property, value):
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
+        if any(f'/{property}' in x for x in list(data.keys())):
+            property = value.split('/')[-2] + '/' + property
+
         if property in data:
             if value != data[property]:
                 if isinstance(value, str):
@@ -58,13 +61,8 @@ def add_json_property(path, property, value):
                         else:
                             break
 
-                    new_name = (((value[:-len(res)])[::-1])[:((value[:-len(res)])[::-1]).find('/')])[::-1] + res[::-1]
-                    old_name = (((old_value[:-len(res)])[::-1])[:((old_value[:-len(res)])[::-1]).find('/')])[::-1] + res[::-1] # "Working prototype"
-
-                    # new_name = (value[:-len(res)])[::-1] 
-                    # new_name = (((value[:-len(res)])[::-1])[:new_name.find('/')])[::-1] + res[::-1]
-                    # old_name = (old_value[:-len(res)])[::-1]
-                    # old_name = (old_name[:old_name.find('/')])[::-1] + res[::-1]
+                    new_name = (value[:-len(res)]).split('/')[-1] + (res[::-1])
+                    old_name = (old_value[:-len(res)]).split('/')[-1] + (res[::-1])
 
                     data[new_name] = value
                     data[old_name] = old_value
@@ -84,6 +82,7 @@ def add_json_property(path, property, value):
         return f'error: Ошибка при работе с файлом: {e}'
     
 def remove_json_property(path, property):
+    # TODO: Clean up unused tab paths after removal
     try:
         if not property or not isinstance(property, str):
             return 'invalid_key_name'
@@ -95,9 +94,18 @@ def remove_json_property(path, property):
             del data[property]
         else:
             return 'property_not_found'
+        
+        for j in list(data.keys()):
+            count = 0
+            if f'{property[property.find('/') + 1:]}' in j:
+                count += 1
+
 
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+
+        # if any(f'{property[property.find('/') + 1:]}' in list(data.keys())):
+
 
         return 'success'
 

@@ -1,5 +1,5 @@
 import os
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QSizePolicy, QScrollArea
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QSizePolicy, QScrollArea, QMessageBox
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QPainter, QColor, QFont, QFontMetrics
 import utils.helpers as helpers
@@ -64,10 +64,39 @@ class tabs(QWidget):
         layout.addWidget(self.scroll_area)
 
     def on_add_tab_clicked(self):
-        # add: load file
+        # TODO: load file
         file_name, directory = helpers.open_file_dialog(self)
         helpers.add_json_property(self.path_tabs, file_name, directory)
         self.reload_tabs(file_name, directory)
+
+    def check_file_access(self, path):
+        """отработка ошибки чтения файла"""
+        except_msg = (f"File exists: {os.path.exists(path)}\n")
+        except_msg += (f"Readable: {os.access(path, os.R_OK)}\n")
+        except_msg += (f"Writable: {os.access(path, os.W_OK)}\n")
+        except_msg += (f"Executable: {os.access(path, os.X_OK)}")
+
+        return except_msg
+    
+    def on_tab_clicked(self, path):
+        """Загружаем файл в редактор при клике на вкладку"""
+        if os.access(path, os.R_OK): # чтение
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    # Передаем содержимое в текстовый редактор
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Read Error", 
+                    f"Cannot read file: {path}\nError: {e}"
+                ) # TODO: realisation in main window
+        else:
+            QMessageBox.critical(
+                self,
+                "Read Access Denied",
+                f"No read permission: {path}\n-------\n{self.check_file_access(path)}"
+            ) # TODO: realisation in main window
 
     def on_remove_tab_clicked(self, name):
         # add: save file
@@ -86,11 +115,11 @@ class tabs(QWidget):
         self.property_tabs = helpers.get_json_property(self.path_tabs)
         self.count_tabs = len(self.property_tabs)
         
-        self.add_tab(file_name, directory)
+        self.add_tab()
         
         self.tabs_container.setMinimumWidth(self.tabs_width)
     
-    def add_tab(self, file_name=None, directory=None):
+    def add_tab(self):
         font = QFont("Monospace", 10)
         metrics = QFontMetrics(font)
         
@@ -112,6 +141,7 @@ class tabs(QWidget):
             btn.setCursor(Qt.PointingHandCursor)
             btn.setProperty("class", "tab")
             btn.setFont(font)
+            btn.clicked.connect(lambda checked, n=name: self.on_tab_clicked(self.property_tabs[n]))
             
             btn_remove = QPushButton('x')
             btn_remove.setFixedSize(40, 18)
