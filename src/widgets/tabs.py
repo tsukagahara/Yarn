@@ -191,15 +191,15 @@ class tabs(QWidget):
             }}
             
             QPushButton[class="tab"]:pressed {{
-                background-color: {self.accent_primary};
+                background-color: {"#90" + self.accent_primary[1:]};
             }}
             QWidget[class="tab_widget"] {{
-                background-color: {'#60' + self.accent_primary[1:]};
-                border: 1px solid {'#80' + self.accent_primary[1:]};
+                background-color: transparent;
+                border: 1px solid {"#80" + self.accent_primary[1:]};
                 border-radius: 3px;
             }}
             QWidget[class="tab_widget"]:hover {{
-                background-color: {'#80' + self.accent_primary[1:]};
+                background-color: transparent;
                 border: 1px solid {self.accent_primary};
             }}
             QToolTip {{

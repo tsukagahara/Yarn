@@ -1,8 +1,7 @@
 import os
-from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-                              QLabel, QPushButton, QTextEdit, QListWidget, QApplication)
+from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication)
 from PySide6.QtGui import QIcon, Qt
-from PySide6.QtCore import QRect
+# from PySide6.QtCore import
 
 from widgets.window_resize import ResizeHandler, toggle_maximize
 import utils.helpers as helpers
@@ -11,12 +10,22 @@ import widgets.window_resize
 from widgets.tabs import tabs
 import widgets.aside as aside
 import widgets.text_editor as te
+import manifests.platform_manifests as manifests
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.resize_handler = ResizeHandler(self)
         self.base_path = helpers.get_project_root()
+
+        manifests.set_platform_manifest(self.base_path)
+
+        icon_path = os.path.join(self.base_path, "resources", "icons", "ico", "Yarn-256.ico")
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+            
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+
         self.setup_main_app()
 
         self.config_path = os.path.join(self.base_path, 'config', 'config.json')
@@ -25,8 +34,6 @@ class MainWindow(QMainWindow):
 
         self.theme_default = self.load_theme() or self.get_fallback_theme()
         self.font_default = self.load_font() or self.get_fallback_font()
-            
-        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
 
         self.create_widgets()
 
@@ -107,10 +114,6 @@ class MainWindow(QMainWindow):
         self.setGeometry(x, y, width, height)
         self.setWindowTitle("Yarn")
         self.setMinimumSize(400, 300)
-        
-        icon_path = os.path.join(self.base_path, "resources", "icons", "ico", "Yarn-256.ico")
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
         
         self.setMouseTracking(True)
         central_widget = QWidget()
