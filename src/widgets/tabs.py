@@ -27,7 +27,7 @@ class tabs(QWidget):
         self.count_tabs = len(self.property_tabs)
         self.setObjectName("tabs")
         layout = QHBoxLayout(self)
-        self.setFixedHeight(23)
+        self.setFixedHeight(25)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
@@ -37,6 +37,7 @@ class tabs(QWidget):
         self.add_tab_btn.setCursor(Qt.PointingHandCursor)
         self.add_tab_btn.setProperty("class", "tab")
         self.add_tab_btn.setFont(QFont("Monospace", 10))
+        self.add_tab_btn.setToolTip("Добавить вкладку")
         self.add_tab_btn.clicked.connect(self.on_add_tab_clicked)
         layout.addWidget(self.add_tab_btn)
         
@@ -70,7 +71,7 @@ class tabs(QWidget):
         self.reload_tabs(file_name, directory)
 
     def check_file_access(self, path):
-        """отработка ошибки чтения файла"""
+        """except file load"""
         except_msg = (f"File exists: {os.path.exists(path)}\n")
         except_msg += (f"Readable: {os.access(path, os.R_OK)}\n")
         except_msg += (f"Writable: {os.access(path, os.W_OK)}\n")
@@ -79,12 +80,12 @@ class tabs(QWidget):
         return except_msg
     
     def on_tab_clicked(self, path):
-        """Загружаем файл в редактор при клике на вкладку"""
+        """Load the file into the editor when clicking on the tab"""
         if os.access(path, os.R_OK): # чтение
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     content = f.read()
-                    # Передаем содержимое в текстовый редактор
+                    # TODO: Transfer the content to the editor
             except Exception as e:
                 QMessageBox.critical(
                     self,
@@ -118,6 +119,8 @@ class tabs(QWidget):
         self.add_tab()
         
         self.tabs_container.setMinimumWidth(self.tabs_width)
+        
+        # TODO: reload tabs_width
     
     def add_tab(self):
         font = QFont("Monospace", 10)
@@ -126,8 +129,8 @@ class tabs(QWidget):
         for i in range(self.count_tabs):
             name = list(self.property_tabs.keys())[i]
             
-            text_width = metrics.horizontalAdvance(name)
-            btn_width = text_width + 40
+            text_width = int(metrics.horizontalAdvance(name) * 1.23)
+            btn_width = text_width
             
             tab_widget = QWidget()
             tab_widget.setProperty("class", "tab_widget")
@@ -141,19 +144,22 @@ class tabs(QWidget):
             btn.setCursor(Qt.PointingHandCursor)
             btn.setProperty("class", "tab")
             btn.setFont(font)
-            btn.clicked.connect(lambda checked, n=name: self.on_tab_clicked(self.property_tabs[n]))
+            btn.setToolTip(f'{self.property_tabs[name]}')
+            btn.setStyleSheet("margin: 0px; padding: 0px;")
+            btn.clicked.connect(lambda checked, n=name: self.on_tab_clicked(self.property_tabs[n])) 
             
             btn_remove = QPushButton('x')
-            btn_remove.setFixedSize(40, 18)
+            btn_remove.setFixedSize(20, 18)
             btn_remove.setCursor(Qt.PointingHandCursor)
             btn_remove.setProperty("class", "tab")
             btn_remove.setFont(QFont("Monospace", 10))
+            btn_remove.setStyleSheet("margin: 0px; padding: 0px;")
             btn_remove.clicked.connect(lambda checked, n=name: self.on_remove_tab_clicked(n))
             
             tabs_layout.addWidget(btn)
             tabs_layout.addWidget(btn_remove)
             
-            tab_width = btn_width + 20
+            tab_width = btn_width + 35
             self.tabs_width += tab_width
             
             tab_widget.setFixedSize(tab_width, 20)
@@ -195,6 +201,13 @@ class tabs(QWidget):
             QWidget[class="tab_widget"]:hover {{
                 background-color: {'#80' + self.accent_primary[1:]};
                 border: 1px solid {self.accent_primary};
+            }}
+            QToolTip {{
+                background-color: #2b2b2b;
+                color: #ffffff;
+                border: 1px solid #555555;
+                padding: 4px;
+                border-radius: 3px;
             }}
         """)
         

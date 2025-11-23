@@ -6,13 +6,44 @@ class aside(QWidget):
     def __init__(self, parent=None, theme=None):
         super().__init__(parent)
         self.theme = theme
+        self.aside_is_open = False
         self.setMouseTracking(True)
-        self.width_aside = 300
-        self.setFixedWidth(self.width_aside)
+        self.setFixedWidth(50)
         self.setup_ui()
         self.apply_theme()
     
     def setup_ui(self):
+        """
+Creates a layout with two main panels:
+- Left panel (widget1): fixed control panel with buttons
+- Right panel (widget2): hidden by default side panel with content
+
+UI Architecture:
+┌────────────────────────────────────────┐
+│ main_layout (QVBoxLayout)              │
+│ ┌────────────────────────────────────┐ │
+│ │ content_frame (QFrame)             │ │
+│ │ ┌─────────────┐ ┌────────────────┐ │ │
+│ │ │ widget1     │ │ widget2        │ │ │
+│ │ │ (50px wide) │ │ (aside panel)  │ │ │
+│ │ │ ┌─────────┐ │ │ ┌────────────┐ │ │ │
+│ │ │ │ btn_a   │ │ │ │ label2     │ │ │ │
+│ │ │ │ btn_b   │ │ │ │            │ │ │ │
+│ │ │ │ ...     │ │ │ │            │ │ │ │
+│ │ │ └─────────┘ │ │ └────────────┘ │ │ │
+│ │ └─────────────┘ └────────────────┘ │ │
+│ └────────────────────────────────────┘ │
+└────────────────────────────────────────┘
+
+Widgets:
+- self.btn_a: button to toggle side panel visibility
+- btn_b, btn_c, btn_d, btn_e: additional buttons (placeholders)
+- self.widget2: hidden side panel, controlled by btn_a
+
+States:
+- Default: widget1 visible, widget2 hidden
+- When btn_a is clicked: widget2 appears/disappears
+        """
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
@@ -24,47 +55,91 @@ class aside(QWidget):
         content_layout.setSpacing(0)
         content_layout.setContentsMargins(0, 0, 0, 0)
 
-        widget1 = QFrame()
-        widget1.setFixedWidth(int(self.width_aside // 6))
-        btn_a = QPushButton(">>")
-        btn_b = QPushButton(">>")
-        btn_c = QPushButton(">>")
-        btn_d = QPushButton(">>")
-        btn_e = QPushButton(">>")
-        widget1_layout = QVBoxLayout(widget1)
-        widget1_layout.addWidget(btn_a)
-        widget1_layout.addWidget(btn_b)
-        widget1_layout.addWidget(btn_c)
-        widget1_layout.addWidget(btn_d)
-        widget1_layout.addWidget(btn_e)
+        # left control panel
+        self.widget1 = QFrame()
+        self.widget1.setFixedWidth(50)
+        self.btn_toggle = QPushButton(">>")
+        self.btn_toggle.setToolTip("Боковая панель")
+        self.btn_toggle.clicked.connect(self.aside_state)
+
+        self.btn_workspaces = QPushButton("🗂")
+        self.btn_workspaces.setToolTip("Пространства")
+
+        self.btn_tools = QPushButton("🛠") 
+        self.btn_tools.setToolTip("Инструменты")
+
+        self.btn_plugins = QPushButton("🧩")
+        self.btn_plugins.setToolTip("Плагины")
+
+        self.btn_settings = QPushButton("⚙")
+        self.btn_settings.setToolTip("Настройки")
         
-        widget2 = QFrame()
-        widget2.setFixedWidth(int(self.width_aside * 5 // 6))
-        label2 = QLabel("self.width_aside * 5 // 6")
-        widget2_layout = QVBoxLayout(widget2)
+        widget1_layout = QVBoxLayout(self.widget1)
+        widget1_layout.addWidget(self.btn_toggle)
+        widget1_layout.addWidget(self.btn_workspaces)
+        widget1_layout.addWidget(self.btn_tools)
+        widget1_layout.addWidget(self.btn_plugins)
+        widget1_layout.addWidget(self.btn_settings)
+        
+        # right side panel 
+        self.widget2 = QFrame()
+        self.widget2.hide()
+        
+        label2 = QLabel()
+        widget2_layout = QVBoxLayout(self.widget2)
         widget2_layout.addWidget(label2)
         
-        content_layout.addWidget(widget1)
-        content_layout.addWidget(widget2)
+        # add_widgets_to_main_layout 
+        content_layout.addWidget(self.widget1)
+        content_layout.addWidget(self.widget2)
         
         main_layout.addWidget(self.content_frame)
+    
+    def aside_state(self):
+#       """adjust aside state"""
+        if self.aside_is_open:
+            self.hide_aside()
+        else:
+            self.show_aside()
+        
+        self.aside_is_open = not self.aside_is_open
+
+    def show_aside(self):
+#       """show_left_panel"""
+        self.widget2.show()
+        self.setFixedWidth(300)
+        self.btn_toggle.setText("<<")
+
+    def hide_aside(self):
+#       """hide_left_panel"""
+        self.widget2.hide()
+        self.setFixedWidth(50)
+        self.btn_toggle.setText(">>")
 
     def apply_theme(self):
+        """
+        Applies color theme to UI elements using CSS styling.
+        Updates main widget and button styles with theme colors.
+        """
+        # Extract theme colors
         self.bg_card = self.theme.get('bg_card')
         self.bg_color = self.theme.get('bg_color')
         self.accent_color = self.theme.get('accent_color')
-        self.accent_primary =  self.theme.get('accent_primary')
+        self.accent_primary = self.theme.get('accent_primary')
         self.text_main = self.theme.get('text_main')
         self.btn_bg_color = self.theme.get('btn_bg_color')
         self.btn_hover_bg_color = self.theme.get('btn_hover_bg_color')
 
+        # Refresh UI
         self.update()
         
+        # Apply main widget styling
         self.setStyleSheet(f"""
                 background-color: {self.bg_card}; 
                 color: {self.text_main};
-                border: 1px solid #444;
             """)
+    
+    # Apply button styling to content frame
         self.content_frame.setStyleSheet(f"""
             QPushButton {{
                 background-color: {self.btn_bg_color};
@@ -82,4 +157,11 @@ class aside(QWidget):
             QPushButton:pressed {{
                 background-color: {self.accent_primary};
             }}
-        """)
+            QToolTip {{
+                background-color: #2b2b2b;
+                color: #ffffff;
+                border: 1px solid #555555;
+                padding: 4px;
+                border-radius: 3px;
+            }}
+            """)
