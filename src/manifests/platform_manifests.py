@@ -49,7 +49,7 @@ def set_apple_manifest(base_path):
         set_macos_manifest(base_path)
 
 def is_ios():
-    """Определяем iOS или macOS"""
+    """iOS or macOS"""
     try:
         if 'ios' in sys.platform or 'iphone' in sys.platform.lower():
             return True

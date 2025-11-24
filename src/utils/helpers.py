@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt
 def open_file_dialog(self):
     file_path, _ = QFileDialog.getOpenFileName(
         self, 
-        "Выберите файл",
+        "Select File",
         "",
         "All Files (*)"
     )
@@ -28,15 +28,15 @@ def get_project_root():
 def get_json_property(path, preference_name=""):
     try:
         with open(path, 'r', encoding='utf-8') as f:
-            if preference_name=="":
+            if preference_name == "":
                 return json.load(f)
             return json.load(f).get(preference_name)
     except FileNotFoundError:
-        raise FileNotFoundError(f"JSON файл не найден: {path}")
+        raise FileNotFoundError(f"JSON file not found: {path}")
     except json.JSONDecodeError as e:
-        raise ValueError(f"Ошибка парсинга JSON в файле {path}: {e}")
+        raise ValueError(f"JSON parsing error in file {path}: {e}")
     except Exception as e:
-        raise RuntimeError(f"Ошибка при чтении файла {path}: {e}")
+        raise RuntimeError(f"Error reading file {path}: {e}")
     
 def add_json_property(path, property, value):
     try:
@@ -67,7 +67,8 @@ def add_json_property(path, property, value):
                     data[new_name] = value
                     data[old_name] = old_value
 
-        else: data[property] = value
+        else: 
+            data[property] = value
 
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
@@ -75,11 +76,11 @@ def add_json_property(path, property, value):
         return 'success'
 
     except FileNotFoundError:
-        return 'error: JSON файл не найден'
+        return 'error: JSON file not found'
     except json.JSONDecodeError as e:
-        return f'error: Ошибка парсинга JSON: {e}'
+        return f'error: JSON parsing error: {e}'
     except Exception as e:
-        return f'error: Ошибка при работе с файлом: {e}'
+        return f'error: File operation error: {e}'
     
 def remove_json_property(path, property):
     # TODO: Clean up unused tab paths after removal
@@ -97,29 +98,25 @@ def remove_json_property(path, property):
         
         for j in list(data.keys()):
             count = 0
-            if f'{property[property.find('/') + 1:]}' in j:
+            if f'{property[property.find("/") + 1:]}' in j:
                 count += 1
-
 
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
-        # if any(f'{property[property.find('/') + 1:]}' in list(data.keys())):
-
-
         return 'success'
 
     except FileNotFoundError:
-        return 'error: JSON файл не найден'
+        return 'error: JSON file not found'
     except json.JSONDecodeError as e:
-        return f'error: Ошибка парсинга JSON: {e}'
+        return f'error: JSON parsing error: {e}'
     except Exception as e:
-        return f'error: Ошибка при работе с файлом: {e}'
+        return f'error: File operation error: {e}'
 
-class colors_is_suitable(QDialog):
+class ColorContrastCheckDialog(QDialog):
     def __init__(self, theme_default, main_font_style, base_path, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Проверка контрасности шрифта на фоне")
+        self.setWindowTitle("Font Color Contrast Check")
         self.setFixedSize(1000, 500)
         self.setModal(True)
         self.theme_default = theme_default
@@ -131,7 +128,7 @@ class colors_is_suitable(QDialog):
     def setup_ui(self):
         layout = QVBoxLayout(self)
 
-        label_title = QLabel("Проверка контрасности шрифта на фоне")
+        label_title = QLabel("Font Color Contrast Check")
         label_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label_title.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px;")
         layout.addWidget(label_title)
@@ -144,15 +141,15 @@ class colors_is_suitable(QDialog):
         fonts_file_path = os.path.join(self.base_path, "resources", "fonts", f"{fonts_name}.json")
 
         label_text = QLabel(
-            f'Параметр "isDark" в {theme_file_path} равен параметру\n'
-            f'"fontIsDark" в {fonts_file_path}, что означает плохую контрасность текста'
+            f'The "isDark" parameter in {theme_file_path} equals the\n'
+            f'"fontIsDark" parameter in {fonts_file_path}, indicating poor text contrast'
         )
 
         label_text.setAlignment(Qt.AlignmentFlag.AlignLeft)
         label_text.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px, 2px; margin: 20px;")
         layout.addWidget(label_text)
 
-        example_title = QLabel("вот так будет выглядеть ваш стиль, если он читаем - вы вольны его оставить")
+        example_title = QLabel("This is how your style will look. If it's readable - you can keep it")
         example_title.setAlignment(Qt.AlignmentFlag.AlignLeft)
         example_title.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px, 2px; margin: 20px;")
         layout.addWidget(example_title)
@@ -164,11 +161,11 @@ class colors_is_suitable(QDialog):
 
         button_layout = QHBoxLayout()
 
-        reject_btn = QPushButton("поменять")
+        reject_btn = QPushButton("Change")
         reject_btn.clicked.connect(self.reject)
         button_layout.addWidget(reject_btn)
 
-        accept_btn = QPushButton("оставить")
+        accept_btn = QPushButton("Keep")
         accept_btn.clicked.connect(self.accept)
         button_layout.addWidget(accept_btn)
 

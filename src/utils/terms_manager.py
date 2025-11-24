@@ -41,7 +41,7 @@ class TermsManager:
 class TermsDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Лицензионное соглашение MIT")
+        self.setWindowTitle("License Agreement MIT")
         self.setFixedSize(500, 500)
         self.setModal(True)
         self.base_path = helpers.get_project_root()
@@ -51,7 +51,7 @@ class TermsDialog(QDialog):
     def setup_ui(self):
         layout = QVBoxLayout(self)
 
-        label_title = QLabel("Лицензионное соглашение MIT")
+        label_title = QLabel("License Agreement MIT")
         label_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label_title.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px;")
         layout.addWidget(label_title)
@@ -74,11 +74,11 @@ class TermsDialog(QDialog):
 
         button_layout = QHBoxLayout()
         
-        reject_btn = QPushButton("Не принимаю")
+        reject_btn = QPushButton("I Disagree")
         reject_btn.clicked.connect(self.reject)
         button_layout.addWidget(reject_btn)
 
-        accept_btn = QPushButton("Принимаю условия")
+        accept_btn = QPushButton("I Agree")
         accept_btn.clicked.connect(self.accept)
         button_layout.addWidget(accept_btn)
 

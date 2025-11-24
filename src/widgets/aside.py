@@ -13,11 +13,10 @@ class aside(QWidget):
         self.setMouseTracking(True)
         self.setFixedWidth(50)
         
-        # Создаем widget1 ДО setup_ui()
         self.widget1 = QFrame()
         self.btn_toggle = QPushButton(">>")
         
-        al.init_widget(self)  # ← передаем self в al
+        al.init_widget(self)
         
         self.setup_ui()
         self.apply_theme()
@@ -62,45 +61,46 @@ States:
         self.content_frame = QFrame()
         
         content_layout = QHBoxLayout(self.content_frame)
-        content_layout.setAlignment(Qt.AlignTop)
         content_layout.setSpacing(0)
         content_layout.setContentsMargins(0, 0, 0, 0)
 
         # left control panel
         self.widget1.setFixedWidth(50)
         self.btn_toggle = QPushButton(">>")
-        self.btn_toggle.setToolTip("Боковая панель")
+        self.btn_toggle.setToolTip("Aside panel")
 
         self.btn_workspaces = QPushButton("🗂")
-        self.btn_workspaces.setToolTip("Пространства")
+        self.btn_workspaces.setToolTip("Workspaces")
         self.btn_workspaces.clicked.connect(al.btn_workspaces_clicked)
 
         self.btn_tools = QPushButton("🛠") 
-        self.btn_tools.setToolTip("Инструменты")
+        self.btn_tools.setToolTip("Tools")
         self.btn_tools.clicked.connect(al.btn_tools_clicked)
 
         self.btn_plugins = QPushButton("🧩")
-        self.btn_plugins.setToolTip("Плагины")
+        self.btn_plugins.setToolTip("Plugins")
         self.btn_plugins.clicked.connect(al.btn_plugins_clicked)
 
         self.btn_settings = QPushButton("⚙")
-        self.btn_settings.setToolTip("Настройки")
+        self.btn_settings.setToolTip("Settings")
         self.btn_settings.clicked.connect(al.btn_settings_clicked)
         
         widget1_layout = QVBoxLayout(self.widget1)
+        widget1_layout.setAlignment(Qt.AlignTop)
         widget1_layout.addWidget(self.btn_toggle)
         widget1_layout.addWidget(self.btn_workspaces)
         widget1_layout.addWidget(self.btn_tools)
         widget1_layout.addWidget(self.btn_plugins)
         widget1_layout.addWidget(self.btn_settings)
+        widget1_layout.addStretch()
         
         # right side panel 
         self.widget2 = QFrame()
         self.widget2.hide()
         
-        label2 = QLabel()
-        widget2_layout = QVBoxLayout(self.widget2)
-        widget2_layout.addWidget(label2)
+        self.widget2_layout = QVBoxLayout(self.widget2)
+        self.widget2_layout.setAlignment(Qt.AlignTop)
+        self.widget2_layout.addStretch()
         
         # add_widgets_to_main_layout 
         content_layout.addWidget(self.widget1)

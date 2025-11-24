@@ -37,7 +37,7 @@ class tabs(QWidget):
         self.add_tab_btn.setCursor(Qt.PointingHandCursor)
         self.add_tab_btn.setProperty("class", "add_btn")
         self.add_tab_btn.setFont(QFont("Monospace", 10))
-        self.add_tab_btn.setToolTip("Добавить вкладку")
+        self.add_tab_btn.setToolTip("Add tab")
         self.add_tab_btn.clicked.connect(self.on_add_tab_clicked)
         layout.addWidget(self.add_tab_btn)
         
@@ -81,7 +81,7 @@ class tabs(QWidget):
     
     def on_tab_clicked(self, path):
         """Load the file into the editor when clicking on the tab"""
-        if os.access(path, os.R_OK): # чтение
+        if os.access(path, os.R_OK):
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     content = f.read()
