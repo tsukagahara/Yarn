@@ -1,3 +1,6 @@
+# from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QSizePolicy, QScrollArea, QMessageBox
+# from PySide6.QtCore import Qt, QEvent
+# from PySide6.QtGui import QPainter, QColor, QFont, QFontMetrics
 import json
 import os
 import utils.helpers as helpers
@@ -39,19 +42,19 @@ def hide_aside():
 
 def btn_workspaces_clicked():
     control_sidebar_behavior('btn_workspaces')
-    _main_widget.label2.setText("Workspaces")
+    # _main_widget.label2.setText("Workspaces")
 
 def btn_tools_clicked():
     control_sidebar_behavior('btn_tools')
-    _main_widget.label2.setText("Tools")
+    # _main_widget.label2.setText("Tools")
 
 def btn_plugins_clicked():
     control_sidebar_behavior('btn_plugins')
-    _main_widget.label2.setText("Plugins")
+    # _main_widget.label2.setText("Plugins")
 
 def btn_settings_clicked():
     control_sidebar_behavior('btn_settings')
-    _main_widget.label2.setText("Settings")
+    # _main_widget.label2.setText("Settings")
 
 def set_active_button(key):
     with open(btn_config_path, "r", encoding="utf-8") as f:
@@ -85,12 +88,3 @@ def get_active_btn():
     data = helpers.get_json_property(btn_config_path)
     filtered = filter(lambda x: data[x] == True and x != 'aside_is_open', data)
     return next(filtered, None)
-
-def set_aside_content(widget_instance):
-    active_btn = get_active_btn()
-    if active_btn == 'btn_workspaces':
-        property_name = QLayout("workspaces")
-        _main_widget.widget2.addWidget()
-    # elif active_btn == 'btn_tools':
-    # elif active_btn == 'btn_plugins':
-    # else:

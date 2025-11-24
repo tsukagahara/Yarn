@@ -112,6 +112,30 @@ def remove_json_property(path, property):
         return f'error: JSON parsing error: {e}'
     except Exception as e:
         return f'error: File operation error: {e}'
+    
+def get_files_from_directory(folder_path, endswith=None):
+    """Returns files from directory. If endswith provided, filters by file extension"""
+    current_files = {}
+    
+    if not os.path.exists(folder_path):
+        return current_files
+    
+    if endswith and not endswith.startswith('.'):
+        endswith = '.' + endswith
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        
+        if os.path.isfile(file_path):
+            name_without_extension = os.path.splitext(filename)[0]
+            
+            if endswith:
+                if filename.endswith(endswith):
+                    current_files[name_without_extension] = file_path
+            else:
+                current_files[name_without_extension] = file_path
+    
+    return current_files
 
 class ColorContrastCheckDialog(QDialog):
     def __init__(self, theme_default, main_font_style, base_path, parent=None):

@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton
-from PySide6.QtCore import Qt
-import json
-import os
+from PySide6.QtCore import Qt, QEvent
+from PySide6.QtGui import QPainter, QColor, QFont, QFontMetrics
 import utils.helpers as helpers
 import utils.aside_manager as al
+import os
 # from PySide6.QtGui import
 
 class aside(QWidget):
@@ -100,6 +100,21 @@ States:
         
         self.widget2_layout = QVBoxLayout(self.widget2)
         self.widget2_layout.setAlignment(Qt.AlignTop)
+
+        # Workspaces
+        workspaces_path = os.path.join(helpers.get_project_root(), "config", "workspaces")
+        workspaces = helpers.get_files_from_directory(workspaces_path, 'json')
+        font = QFont("Monospace", 10) # TODO: get font from property
+        for name in workspaces:
+            btn = QPushButton(name)
+            btn.setFixedSize(200, 18)
+            btn.setCursor(Qt.PointingHandCursor)
+            btn.setProperty("class", "tab")
+            btn.setFont(font)
+            btn.setToolTip(f'{workspaces[name]}')
+            btn.setStyleSheet("margin: 0px; padding: 0px;")
+            self.widget2_layout.addWidget(btn)
+        
         self.widget2_layout.addStretch()
         
         # add_widgets_to_main_layout 

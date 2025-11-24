@@ -1,5 +1,9 @@
 Yarn/
 ├── config/
+│   ├── workspaces/                     # простраства и их данные
+│   │   ├── other.json
+│   │   ├── personal.json
+│   │   └── work.json
 │   ├── btn_settings_config.json        # для aside_logic.py, содержит состояние кнопок
 │   ├── config.json                     # Конфигурации
 │   └── tabs_config.json                # Хранит ссылки и названия вкладок которые вызывает tabs.py
