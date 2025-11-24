@@ -35,7 +35,7 @@ class tabs(QWidget):
         self.add_tab_btn = QPushButton("+")
         self.add_tab_btn.setFixedSize(50, 18)
         self.add_tab_btn.setCursor(Qt.PointingHandCursor)
-        self.add_tab_btn.setProperty("class", "tab")
+        self.add_tab_btn.setProperty("class", "add_btn")
         self.add_tab_btn.setFont(QFont("Monospace", 10))
         self.add_tab_btn.setToolTip("Добавить вкладку")
         self.add_tab_btn.clicked.connect(self.on_add_tab_clicked)
@@ -129,7 +129,7 @@ class tabs(QWidget):
         for i in range(self.count_tabs):
             name = list(self.property_tabs.keys())[i]
             
-            text_width = int(metrics.horizontalAdvance(name) * 1.23)
+            text_width = int(metrics.horizontalAdvance(name) * 1.25)
             btn_width = text_width
             
             tab_widget = QWidget()
@@ -159,7 +159,7 @@ class tabs(QWidget):
             tabs_layout.addWidget(btn)
             tabs_layout.addWidget(btn_remove)
             
-            tab_width = btn_width + 35
+            tab_width = btn_width + 40
             self.tabs_width += tab_width
             
             tab_widget.setFixedSize(tab_width, 20)
@@ -179,28 +179,37 @@ class tabs(QWidget):
 
         self.update()        
         self.setStyleSheet(f"""
+            QPushButton[class="add_btn"] {{
+                background-color: {self.btn_bg_color};
+                color: {self.text_main};
+                border: 1px solid {self.accent_color};
+                margin: 0px 5px;
+                border-radius: 3px;
+            }}
+            
+            QPushButton[class="add_btn"]:hover {{
+                background-color: {self.btn_hover_bg_color};
+                border: 1px solid {self.accent_primary};
+            }}
+            
+            QPushButton[class="add_btn"]:pressed {{
+                background-color: {self.accent_primary};
+                color: {self.accent_color}
+            }}
             QPushButton[class="tab"] {{
                 background-color: transparent;
                 color: {self.text_main};
                 border-radius: 3px;
                 font-weight: 600;
             }}
-            
-            QPushButton[class="tab"]:hover {{
-                background-color: {'#20' + self.btn_bg_color[1:]};
-            }}
-            
-            QPushButton[class="tab"]:pressed {{
-                background-color: {"#90" + self.accent_primary[1:]};
-            }}
             QWidget[class="tab_widget"] {{
-                background-color: transparent;
-                border: 1px solid {"#80" + self.accent_primary[1:]};
+                background-color: {self.btn_bg_color};
+                border-radius: 3px;
+                padding: 0px 10px;
                 border-radius: 3px;
             }}
             QWidget[class="tab_widget"]:hover {{
-                background-color: transparent;
-                border: 1px solid {self.accent_primary};
+                border: 1px solid #fff;
             }}
             QToolTip {{
                 background-color: #2b2b2b;

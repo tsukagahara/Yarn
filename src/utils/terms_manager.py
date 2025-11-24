@@ -16,7 +16,6 @@ class TermsManager:
             self.config_data = {"termsAccepted": False, "theme": "dark_theme", "fonts": "basic_fonts"}
 
     def search_termsAccepted(self):
-        
         if self.config_data.get("termsAccepted") == True:
             return True
         else:

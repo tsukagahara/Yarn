@@ -1,16 +1,27 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton
 from PySide6.QtCore import Qt
+import json
+import os
+import utils.helpers as helpers
+import utils.aside_manager as al
 # from PySide6.QtGui import
 
 class aside(QWidget):
     def __init__(self, parent=None, theme=None):
         super().__init__(parent)
         self.theme = theme
-        self.aside_is_open = False
         self.setMouseTracking(True)
         self.setFixedWidth(50)
+        
+        # Создаем widget1 ДО setup_ui()
+        self.widget1 = QFrame()
+        self.btn_toggle = QPushButton(">>")
+        
+        al.init_widget(self)  # ← передаем self в al
+        
         self.setup_ui()
         self.apply_theme()
+        self.btn_toggle.clicked.connect(al.aside_state)
     
     def setup_ui(self):
         """
@@ -56,23 +67,25 @@ States:
         content_layout.setContentsMargins(0, 0, 0, 0)
 
         # left control panel
-        self.widget1 = QFrame()
         self.widget1.setFixedWidth(50)
         self.btn_toggle = QPushButton(">>")
         self.btn_toggle.setToolTip("Боковая панель")
-        self.btn_toggle.clicked.connect(self.aside_state)
 
         self.btn_workspaces = QPushButton("🗂")
         self.btn_workspaces.setToolTip("Пространства")
+        self.btn_workspaces.clicked.connect(al.btn_workspaces_clicked)
 
         self.btn_tools = QPushButton("🛠") 
         self.btn_tools.setToolTip("Инструменты")
+        self.btn_tools.clicked.connect(al.btn_tools_clicked)
 
         self.btn_plugins = QPushButton("🧩")
         self.btn_plugins.setToolTip("Плагины")
+        self.btn_plugins.clicked.connect(al.btn_plugins_clicked)
 
         self.btn_settings = QPushButton("⚙")
         self.btn_settings.setToolTip("Настройки")
+        self.btn_settings.clicked.connect(al.btn_settings_clicked)
         
         widget1_layout = QVBoxLayout(self.widget1)
         widget1_layout.addWidget(self.btn_toggle)
@@ -94,27 +107,6 @@ States:
         content_layout.addWidget(self.widget2)
         
         main_layout.addWidget(self.content_frame)
-    
-    def aside_state(self):
-#       """adjust aside state"""
-        if self.aside_is_open:
-            self.hide_aside()
-        else:
-            self.show_aside()
-        
-        self.aside_is_open = not self.aside_is_open
-
-    def show_aside(self):
-#       """show_left_panel"""
-        self.widget2.show()
-        self.setFixedWidth(300)
-        self.btn_toggle.setText("<<")
-
-    def hide_aside(self):
-#       """hide_left_panel"""
-        self.widget2.hide()
-        self.setFixedWidth(50)
-        self.btn_toggle.setText(">>")
 
     def apply_theme(self):
         """
@@ -156,6 +148,7 @@ States:
             
             QPushButton:pressed {{
                 background-color: {self.accent_primary};
+                color: {self.accent_color}
             }}
             QToolTip {{
                 background-color: #2b2b2b;

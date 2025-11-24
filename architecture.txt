@@ -1,5 +1,6 @@
-text_editor_noble/
+Yarn/
 ├── config/
+│   ├── btn_settings_config.json        # для aside_logic.py, содержит состояние кнопок
 │   ├── config.json                     # Конфигурации
 │   └── tabs_config.json                # Хранит ссылки и названия вкладок которые вызывает tabs.py
 ├── src/
@@ -17,6 +18,7 @@ text_editor_noble/
 │   │   └── syntax_highlighter.py       # Подсветка синтаксиса
 │   ├── utils/
 │   │   ├── __init__.py
+│   │   ├── aside_manager.py              # манипуляция состояний кнопок из aside
 │   │   ├── color_utils.py              # Манипуляции с цветом (hex)
 │   │   ├── helpers.py                  # Вспомогательные функции
 │   │   └── terms_manager.py            # Принятие условий пользования

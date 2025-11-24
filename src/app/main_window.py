@@ -11,6 +11,7 @@ from widgets.tabs import tabs
 import widgets.aside as aside
 import widgets.text_editor as te
 import manifests.platform_manifests as manifests
+from utils.aside_manager import show_aside
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -43,6 +44,8 @@ class MainWindow(QMainWindow):
         if self.is_color_suitable:
             dialog = helpers.colors_is_suitable(self.theme_default, self.main_font_style, self.base_path, parent=self)
             dialog.exec()
+        if helpers.get_json_property(os.path.join(helpers.get_project_root(), "config", "btn_settings_config.json"), 'aside_is_open'):
+            show_aside()
 
     def mousePressEvent(self, event):
         if self.resize_handler.mouse_press(event):
