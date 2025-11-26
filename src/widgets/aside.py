@@ -3,10 +3,10 @@ from PySide6.QtCore import Qt
 import utils.helpers as helpers
 import utils.aside_manager as al
 import os
+from widgets.aside_panels.tools import ToolsPanel
+from widgets.aside_panels.plugins import PluginsPanel  
+from widgets.aside_panels.settings import SettingsPanel
 from widgets.aside_panels.workspaces import WorkspacesPanel
-# from widgets.aside_panels.tools import ToolsPanel
-# from widgets.aside_panels.plugins import PluginsPanel  
-# from widgets.aside_panels.settings import SettingsPanel
 
 class aside(QWidget):
     """Aside widget"""
@@ -36,17 +36,17 @@ class aside(QWidget):
         self.workspaces_panel = WorkspacesPanel(self.base_path, self.tabs)
         al.register_panel('workspaces', self.workspaces_panel)
         
-        #TODO: Tools panel
-        # self.tools_panel = ToolsPanel(self.base_path, self.tabs)
-        # al.register_panel('tools', self.tools_panel)
+        # Tools panel
+        self.tools_panel = ToolsPanel(self.base_path)
+        al.register_panel('tools', self.tools_panel)
         
-        #TODO: Plugins panel 
-        # self.plugins_panel = PluginsPanel(self.base_path, self.tabs)
-        # al.register_panel('plugins', self.plugins_panel)
+        # Plugins panel 
+        self.plugins_panel = PluginsPanel(self.base_path)
+        al.register_panel('plugins', self.plugins_panel)
         
-        #TODO: Settings panel
-        # self.settings_panel = SettingsPanel(self.base_path, self.tabs)
-        # al.register_panel('settings', self.settings_panel)
+        # Settings panel
+        self.settings_panel = SettingsPanel(self.base_path)
+        al.register_panel('settings', self.settings_panel)
     
     def setup_ui(self):
         """
@@ -136,14 +136,14 @@ States:
         self.widget2_layout.setSpacing(0)
         
         self.widget2_layout.addWidget(self.workspaces_panel)
-        # self.widget2_layout.addWidget(self.tools_panel) #TODO
-        # self.widget2_layout.addWidget(self.plugins_panel)
-        # self.widget2_layout.addWidget(self.settings_panel)
+        self.widget2_layout.addWidget(self.tools_panel)
+        self.widget2_layout.addWidget(self.plugins_panel)
+        self.widget2_layout.addWidget(self.settings_panel)
         
         self.workspaces_panel.hide()
-        # self.tools_panel.hide()
-        # self.plugins_panel.hide()
-        # self.settings_panel.hide()
+        self.tools_panel.hide()
+        self.plugins_panel.hide()
+        self.settings_panel.hide()
         
         # add_widgets_to_main_layout 
         content_layout.addWidget(self.widget1)
