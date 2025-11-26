@@ -1,10 +1,12 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFrame, QPushButton
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
 import utils.helpers as helpers
 import utils.aside_manager as al
 import os
-# from PySide6.QtGui import
+from widgets.aside_panels.workspaces import WorkspacesPanel
+# from widgets.aside_panels.tools import ToolsPanel
+# from widgets.aside_panels.plugins import PluginsPanel  
+# from widgets.aside_panels.settings import SettingsPanel
 
 class aside(QWidget):
     """Aside widget"""
@@ -12,20 +14,39 @@ class aside(QWidget):
         super().__init__(parent)
         self.theme = theme
         self.base_path = base_path
-        
         self.tabs = tabs_widget
-
+        
         self.setMouseTracking(True)
         self.setFixedWidth(50)
         
         self.widget1 = QFrame()
+        self.widget2 = QFrame()
         self.btn_toggle = QPushButton(">>")
         
         al.init_widget(self)
         
+        self.create_panels()
+        
         self.setup_ui()
         self.apply_theme()
-        self.reload_workspaces()
+    
+    def create_panels(self):
+        """Create and register all content panels"""
+        # Workspaces panel
+        self.workspaces_panel = WorkspacesPanel(self.base_path, self.tabs)
+        al.register_panel('workspaces', self.workspaces_panel)
+        
+        #TODO: Tools panel
+        # self.tools_panel = ToolsPanel(self.base_path, self.tabs)
+        # al.register_panel('tools', self.tools_panel)
+        
+        #TODO: Plugins panel 
+        # self.plugins_panel = PluginsPanel(self.base_path, self.tabs)
+        # al.register_panel('plugins', self.plugins_panel)
+        
+        #TODO: Settings panel
+        # self.settings_panel = SettingsPanel(self.base_path, self.tabs)
+        # al.register_panel('settings', self.settings_panel)
     
     def setup_ui(self):
         """
@@ -69,7 +90,7 @@ States:
         content_layout.setSpacing(0)
         content_layout.setContentsMargins(0, 0, 0, 0)
 
-        # left control panel
+        # Left control panel
         self.widget1.setFixedWidth(50)
 
         self.btn_toggle = QPushButton(">>")
@@ -106,101 +127,29 @@ States:
         widget1_layout.addWidget(self.btn_settings)
         widget1_layout.addStretch()
         
-        # right side panel 
-        self.widget2 = QFrame()
+        # Right side panel 
         self.widget2.hide()
         
         self.widget2_layout = QVBoxLayout(self.widget2)
         self.widget2_layout.setAlignment(Qt.AlignTop)
-
-        # Workspaces
-        workspaces_path = os.path.join(self.base_path, "config", "workspaces")
-        workspaces = helpers.get_files_from_directory(workspaces_path, 'json')
-        font = QFont("Monospace", 10) # TODO: get font from property
-
-        self.workspaces_btn = {}
-
-        for name in workspaces:
-            btn = QPushButton(name)
-            btn.setFixedSize(200, 18)
-            btn.setCursor(Qt.PointingHandCursor)
-            btn.setProperty("class", "workspaces")
-            btn.setFont(font)
-            btn.setToolTip(f'{workspaces[name]}')
-            btn.setStyleSheet("margin: 0px; padding: 0px;")
-            btn.clicked.connect(lambda checked, n=name: self.on_workspaces_clicked(workspaces[n], name)) 
-            self.workspaces_btn[name]= btn
-            self.widget2_layout.addWidget(btn)
+        self.widget2_layout.setContentsMargins(0, 0, 0, 0)
+        self.widget2_layout.setSpacing(0)
         
-        self.widget2_layout.addStretch()
+        self.widget2_layout.addWidget(self.workspaces_panel)
+        # self.widget2_layout.addWidget(self.tools_panel) #TODO
+        # self.widget2_layout.addWidget(self.plugins_panel)
+        # self.widget2_layout.addWidget(self.settings_panel)
+        
+        self.workspaces_panel.hide()
+        # self.tools_panel.hide()
+        # self.plugins_panel.hide()
+        # self.settings_panel.hide()
         
         # add_widgets_to_main_layout 
         content_layout.addWidget(self.widget1)
         content_layout.addWidget(self.widget2)
         
         main_layout.addWidget(self.content_frame)
-
-    def on_workspaces_clicked(self, path, name_btn):
-        """Load the file into the editor when clicking on the tab"""
-        current_workspaces = helpers.get_json_property(os.path.join(self.base_path, "config", "config.json"), "current_workspaces")
-        value = (path.split('\\')[-1])[:-5]
-        if current_workspaces == value: return
-        if os.access(path, os.R_OK):
-
-            helpers.replace_json_content(os.path.join(self.base_path, "config", "tabs_config.json"),
-                                         os.path.join(self.base_path, "config", "workspaces", current_workspaces + '.json'))
-            
-            helpers.add_json_property(os.path.join(self.base_path, "config", "config.json"), "current_workspaces", value)
-
-            helpers.replace_json_content(os.path.join(self.base_path, "config", "workspaces", value + '.json'),
-                                         os.path.join(self.base_path, "config", "tabs_config.json"))   
-             
-            if self.tabs:
-                self.tabs.reload_tabs()
-
-            self.reload_workspaces()
-
-    def reload_workspaces(self):
-        """reload style buttons"""
-        for btn in self.workspaces_btn.values():
-            btn.deleteLater()
-        self.workspaces_btn.clear()
-        
-        # cleaning layout
-        while self.widget2_layout.count():
-            child = self.widget2_layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-        
-        # create button
-        workspaces_path = os.path.join(self.base_path, "config", "workspaces")
-        workspaces = helpers.get_files_from_directory(workspaces_path, 'json')
-        font = QFont("Monospace", 10)
-        current_workspace = helpers.get_json_property(
-            os.path.join(self.base_path, "config", "config.json"), 
-            "current_workspaces"
-        )
-
-        for name in workspaces:
-            btn = QPushButton(name)
-            btn.setFixedSize(200, 18)
-            btn.setCursor(Qt.PointingHandCursor)
-            btn.setFont(font)
-            btn.setToolTip(f'{workspaces[name]}')
-            btn.setStyleSheet("margin: 0px; padding: 0px;")
-            btn.clicked.connect(lambda checked, n=name: self.on_workspaces_clicked(workspaces[n], n))
-            
-            # set style for buttons
-            if name == current_workspace:
-                btn.setProperty("class", "active_workspaces")
-            else:
-                btn.setProperty("class", "workspaces")
-            
-            self.workspaces_btn[name] = btn
-            self.widget2_layout.addWidget(btn)
-        
-        self.widget2_layout.addStretch()
-
 
 
     def apply_theme(self):

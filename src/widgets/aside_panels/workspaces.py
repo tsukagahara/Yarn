@@ -1,0 +1,169 @@
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt
+import os
+import utils.helpers as helpers
+
+class WorkspacesPanel(QWidget):
+    def __init__(self, base_path, tabs_manager):
+        super().__init__()
+        self.base_path = base_path
+        self.tabs = tabs_manager
+        self.workspaces_btn = {}
+        self.setup_ui()
+        self.load_workspaces()
+
+    def setup_ui(self):
+        self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+        self.setLayout(self.layout)
+
+    def load_workspaces(self):
+        """Loading workspaces"""
+        workspaces_path = os.path.join(self.base_path, "config", "workspaces")
+        workspaces = helpers.get_files_from_directory(workspaces_path, 'json')
+        font = QFont("Segoe UI", 12)
+
+        for name in workspaces:
+            btn = QPushButton(name)
+            btn.setFixedSize(200, 30)
+            btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            btn.setFont(font)
+            btn.setToolTip(f'{workspaces[name]}')
+            btn.setStyleSheet("margin: 2px; padding: 0px;")
+            btn.clicked.connect(lambda checked, n=name: self.on_workspaces_clicked(workspaces[n], n))
+            
+            # set button style
+            current_workspace = helpers.get_json_property(
+                os.path.join(self.base_path, "config", "config.json"), 
+                "current_workspaces"
+            )
+            if name == current_workspace:
+                btn.setProperty("class", "active_workspaces")
+            else:
+                btn.setProperty("class", "workspaces")
+            
+            self.workspaces_btn[name] = btn
+            self.layout.addWidget(btn)
+        
+        self.layout.addStretch()
+
+    def on_workspaces_clicked(self, path, name_btn):
+        """Workspace click handler"""
+        current_workspaces = helpers.get_json_property(
+            os.path.join(self.base_path, "config", "config.json"), 
+            "current_workspaces"
+        )
+        value = (path.split('\\')[-1])[:-5]
+        
+        if current_workspaces == value: 
+            return
+            
+        if os.access(path, os.R_OK):
+            # Save config
+            helpers.replace_json_content(
+                os.path.join(self.base_path, "config", "tabs_config.json"),
+                os.path.join(self.base_path, "config", "workspaces", current_workspaces + '.json')
+            )
+            
+            # Reload сurrent workspace
+            helpers.add_json_property(
+                os.path.join(self.base_path, "config", "config.json"), 
+                "current_workspaces", 
+                value
+            )
+
+            # Load new config
+            helpers.replace_json_content(
+                os.path.join(self.base_path, "config", "workspaces", value + '.json'),
+                os.path.join(self.base_path, "config", "tabs_config.json")
+            )
+            
+            # Reload tabs
+            if self.tabs:
+                self.tabs.reload_tabs()
+
+            # Reload panel
+            self.reload_workspaces()
+
+    def reload_workspaces(self):
+        """Reload panel workspaces"""
+        # Delite all buttons
+        for btn in self.workspaces_btn.values():
+            btn.deleteLater()
+        self.workspaces_btn.clear()
+        
+        # Cleaning layout
+        while self.layout.count():
+            child = self.layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+        
+        # Reload
+        self.load_workspaces()
+
+    def show_panel(self):
+        self.show()
+
+    def hide_panel(self):
+        self.hide()
+
+    def toggle_panel(self):
+        """Toggle panel visibility"""
+        self.setVisible(not self.isVisible())
+    
+    def apply_theme(self):
+        """
+        Applies color theme to UI elements using CSS styling.
+        Updates main widget and button styles with theme colors.
+        """
+        # Extract theme colors
+        self.bg_card = self.theme.get('bg_card')
+        self.bg_color = self.theme.get('bg_color')
+        self.accent_color = self.theme.get('accent_color')
+        self.accent_primary = self.theme.get('accent_primary')
+        self.text_main = self.theme.get('text_main')
+        self.btn_bg_color = self.theme.get('btn_bg_color')
+        self.btn_hover_bg_color = self.theme.get('btn_hover_bg_color')
+
+        # Refresh UI
+        self.update()
+        
+        # Apply main widget styling
+        self.setStyleSheet(f"""
+                background-color: {self.bg_card}; 
+                color: {self.text_main};
+            """)
+    
+    # Apply button styling to content frame
+        self.content_frame.setStyleSheet(f"""
+            QPushButton[class="workspaces"]{{
+                background-color: {self.btn_bg_color};
+                color: {self.text_main};
+                border: 1px solid {self.accent_color};
+                padding: 5px;
+                border-radius: 3px;
+            }}
+            
+            QPushButton[class="workspaces"]:hover {{
+                background-color: {self.btn_hover_bg_color};
+                border: 1px solid {self.accent_primary};
+            }}
+            
+            QPushButton[class="workspaces"]:pressed {{
+                background-color: {self.accent_primary};
+                color: {self.accent_color}
+            }}
+            QPushButton[class="active_workspaces"] {{
+                background-color: {self.accent_primary};
+                color: {self.accent_color}
+            }}
+            QToolTip {{
+                background-color: #2b2b2b;
+                color: #ffffff;
+                border: 1px solid #555555;
+                padding: 4px;
+                border-radius: 3px;
+            }}
+            """)
