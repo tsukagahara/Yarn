@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFrame, QPushBu
 from PySide6.QtCore import Qt
 import utils.helpers as helpers
 import utils.aside_manager as al
-import services.logging as log
+import services.logger as log
 import os
 from widgets.aside_panels.logs import LogsPanel
 from widgets.aside_panels.tools import ToolsPanel

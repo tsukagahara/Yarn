@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
 import utils.helpers as helpers
-import services.logging as log
+import services.logger as log
 
 class Yarn:
     def __init__(self):
@@ -32,6 +32,6 @@ class Yarn:
         return self.app.exec()
 
 if __name__ == "__main__":
-    log.debug('start Yarn')
+    log.debug('start app')
     yarn_app = Yarn()
     sys.exit(yarn_app.run())

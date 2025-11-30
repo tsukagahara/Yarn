@@ -1,7 +1,7 @@
 import json
 import os
 import utils.helpers as helpers
-import services.logging as log
+import services.logger as log
 
 """Button click handler for aside - manages button states and contains basic logic"""
 
@@ -47,7 +47,7 @@ def manage_panels_visibility(active_key):
     else:
         _current_panel = None
 
-
+@log.log(call_level=4)
 def _get_panel_name_by_button(button_name):
     """Map button names to panel names"""
     panel_mapping = {
@@ -57,7 +57,6 @@ def _get_panel_name_by_button(button_name):
         'btn_settings': 'settings',
         'btn_logs': 'logs'
     }
-    log.debug('btn_' + panel_mapping.get(button_name) + ' clicked', 5)
     return panel_mapping.get(button_name)
 
 def aside_state():

@@ -1,0 +1,9 @@
+{
+    "automatic_log_cleanup": "if logs exceed 50mb", // on every startup, keep last N lines
+    "last_N_lines": 10000,
+    "show_DEBUG_logs": true,
+    "show_INFO_logs": true,
+    "show_ERROR_logs": true,
+    "enable_logging": false,
+    "log_performance": true
+}

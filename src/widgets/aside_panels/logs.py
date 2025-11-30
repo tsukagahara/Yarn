@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
 # from PySide6.QtGui import QFont
 # from PySide6.QtCore import Qt
-# import os
-# import utils.helpers as helpers
+import services.logger as log
+import os
+import utils.helpers as helpers
 
 class LogsPanel(QWidget):
     def __init__(self, base_path, theme):
@@ -10,6 +11,8 @@ class LogsPanel(QWidget):
         self.base_path = base_path
         self.theme = theme
         self.logs_widgets = {}
+        self.path_logs = log.get_log_path()
+
         self.setup_ui()
         self.apply_theme()
 
@@ -28,10 +31,12 @@ class LogsPanel(QWidget):
         self.layout.addWidget(name_property)
         self.logs_widgets["name_property"] = name_property
 
-    def on_logs_clicked(self, path, name_btn):
-        """logs click handler"""
 
-        self.reload_logs()
+
+    # def on_logs_clicked(self, path, name_btn):
+    #     """logs click handler"""
+
+    #     self.reload_logs()
     
     def reload_logs(self):
         """Reload panel logs"""
