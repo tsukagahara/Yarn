@@ -1,10 +1,8 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFrame, QPushButton
 from PySide6.QtCore import Qt
-import utils.helpers as helpers
 import utils.aside_manager as al
-import services.logger as log
 import os
-from widgets.aside_panels.logs import LogsPanel
+# from widgets.aside_panels.logs import LogsPanel
 from widgets.aside_panels.tools import ToolsPanel
 from widgets.aside_panels.plugins import PluginsPanel  
 from widgets.aside_panels.settings import SettingsPanel
@@ -50,8 +48,8 @@ class aside(QWidget):
         self.settings_panel = SettingsPanel(self.base_path, self.theme)
         al.register_panel('settings', self.settings_panel)
 
-        self.logs_panel = LogsPanel(self.base_path, self.theme)
-        al.register_panel('logs', self.logs_panel)
+        # self.logs_panel = LogsPanel(self.base_path, self.theme)
+        # al.register_panel('logs', self.logs_panel)
     
     def setup_ui(self):
         """
@@ -150,13 +148,13 @@ States:
         self.widget2_layout.addWidget(self.tools_panel)
         self.widget2_layout.addWidget(self.plugins_panel)
         self.widget2_layout.addWidget(self.settings_panel)
-        self.widget2_layout.addWidget(self.logs_panel)
+        # self.widget2_layout.addWidget(self.logs_panel)
         
         self.workspaces_panel.hide()
         self.tools_panel.hide()
         self.plugins_panel.hide()
         self.settings_panel.hide()
-        self.logs_panel.hide()
+        # self.logs_panel.hide()
         
         # add_widgets_to_main_layout 
         content_layout.addWidget(self.widget1)

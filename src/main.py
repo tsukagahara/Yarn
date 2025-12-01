@@ -4,8 +4,8 @@ from utils.terms_manager import TermsManager
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
-import utils.helpers as helpers
 import services.logger as log
+import utils.helpers as helpers
 
 class Yarn:
     def __init__(self):

@@ -8,6 +8,7 @@ import utils.helpers as helpers
 from widgets.header import header
 import widgets.window_resize
 from widgets.tabs import tabs
+from widgets.extra_panels.extra_panels_manager import ExtraPanel
 import widgets.aside as aside
 import widgets.text_editor as te
 import manifests.platform_manifests as manifests
@@ -124,10 +125,19 @@ class MainWindow(QMainWindow):
         main_content = QHBoxLayout()
     
         self.aside = aside.aside(parent=self, theme=self.theme_default, tabs_widget=self.tabs, base_path=self.base_path)
+
+        self.right_panel = QWidget()
+        right_layout = QVBoxLayout(self.right_panel)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(0)
+        
         self.text_editor = te.textEditor(parent=self, theme=self.theme_default)
+        self.extra_panel = ExtraPanel(parent=self, theme=self.theme_default)
+        right_layout.addWidget(self.text_editor)
+        right_layout.addWidget(self.extra_panel)
         
         main_content.addWidget(self.aside)
-        main_content.addWidget(self.text_editor)
+        main_content.addWidget(self.right_panel)
         
         self.layout.addLayout(main_content)
     

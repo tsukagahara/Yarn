@@ -2,10 +2,18 @@ import logging
 import time
 import functools
 import os
+import sys
 import inspect
-import utils.helpers as helpers
+
+def get_project_root():
+    """Returns the project root folder"""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    
 def get_log_path():
-    return os.path.join(helpers.get_project_root(), "app.log")
+    return os.path.join(get_project_root(), "app.log")
 
 log_path = get_log_path()
 
@@ -32,7 +40,7 @@ def get_logs():
     with open(log_path, 'r', encoding='utf-8') as f:
         return f.read().splitlines()
 
-def log(mode="debug", call_level=3):  # debug, info, error
+def log(msg=None, mode="debug", call_level=3):  # debug, info, error
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -41,12 +49,14 @@ def log(mode="debug", call_level=3):  # debug, info, error
                 start = time.time()
                 result = func(*args, **kwargs)
                 duration = (time.time() - start) * 1000
-                debug(f"PERF: {func.__name__} took {duration:.2f}ms", level=call_level)
+                message = msg or f"PERF: {func.__name__} took {duration:.2f}ms"
+                debug(message, level=call_level)
                 return result
                 
             elif mode == "info":
                 # INFO: call_arguments
-                info(f"CALL: {func.__name__} with args={args}, kwargs={kwargs}", level=call_level)
+                message = msg or f"CALL: {func.__name__} with args={args}, kwargs={kwargs}"
+                info(message, level=call_level)
                 return func(*args, **kwargs)
                 
             elif mode == "error":
@@ -54,14 +64,16 @@ def log(mode="debug", call_level=3):  # debug, info, error
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    error(f"ERROR in {func.__name__}: {e}", level=call_level)
+                    message = msg or f"ERROR in {func.__name__}: {e}"
+                    error(message, level=call_level)
                     raise
             elif mode == "critical":
                 # CRITICAL: log_exceptions
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    critical(f"CRITICAL in {func.__name__}: {e}", level=call_level)
+                    message = msg or f"CRITICAL in {func.__name__}: {e}"
+                    critical(message, level=call_level)
                     raise
             else: 
                 error(f"ШАКАЛ: неизвестный mode='{mode}' в декораторе @log", level=call_level)

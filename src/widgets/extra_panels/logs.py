@@ -1,9 +1,9 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLabel
 # from PySide6.QtGui import QFont
 # from PySide6.QtCore import Qt
 import services.logger as log
-import os
 import utils.helpers as helpers
+import os
 
 class LogsPanel(QWidget):
     def __init__(self, base_path, theme):
@@ -17,7 +17,7 @@ class LogsPanel(QWidget):
         self.apply_theme()
 
     def setup_ui(self):
-        self.layout = QVBoxLayout()
+        self.layout = QHBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
         self.setLayout(self.layout)
@@ -30,8 +30,6 @@ class LogsPanel(QWidget):
         name_property = QLabel("logs")
         self.layout.addWidget(name_property)
         self.logs_widgets["name_property"] = name_property
-
-
 
     # def on_logs_clicked(self, path, name_btn):
     #     """logs click handler"""

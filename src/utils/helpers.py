@@ -3,6 +3,7 @@ import sys
 import json
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QFileDialog)
 from PySide6.QtCore import Qt
+import services.logger as log
 
 """The script is primarily for manipulating JSON files. Its functions are widely used"""
 
@@ -142,6 +143,15 @@ def remove_json_property(path, property):
         return f'error: JSON parsing error: {e}'
     except Exception as e:
         return f'error: File operation error: {e}'
+
+def save_config(path, data):
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4)
+    except FileNotFoundError:
+        log.error(f'file not found "{path}"')
+    except Exception as e:
+        log.error(f'file not found. eroor: "{e}"')
     
 def get_files_from_directory(folder_path, endswith=None):
     """Returns files from directory. If endswith provided, filters by file extension"""
