@@ -110,6 +110,7 @@ class ExtraPanel(QFrame):
             QFrame {{
                 background-color: {self.bg_card};
                 border: 1px solid {self.accent_gray};
+                border-width: 0px 1px 1px 1px
             }}
         """)
     def close(self):

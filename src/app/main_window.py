@@ -33,19 +33,10 @@ class MainWindow(QMainWindow):
         self.setup_main_app()
         self.config_path = os.path.join(helpers.get_project_root(), 'config', 'config.json')
         self.themes_path =os.path.join(helpers.get_project_root(), 'resources', 'themes')
-        self.fonts_path = os.path.join(self.base_path, 'resources', 'fonts')
 
         self.theme_default = helpers.load_theme()
-        self.font_default = self.load_font() or self.get_fallback_font()
 
         self.create_widgets()
-
-        self.main_font_style = self.font_default["main"]
-        self.monospace_font_style = self.font_default["monospace"]
-        self.is_color_suitable = (self.theme_default["isDark"] == self.main_font_style["fontIsDark"])
-        if self.is_color_suitable:
-            dialog = helpers.colors_is_suitable(self.theme_default, self.main_font_style, self.base_path, parent=self)
-            dialog.exec()
         if helpers.get_json_property(os.path.join(helpers.get_project_root(), "config", "btn_settings_config.json"), 'aside_is_open'):
             show_aside()
 
@@ -63,34 +54,6 @@ class MainWindow(QMainWindow):
         if self.resize_handler.mouse_release(event):
             return
         super().mouseReleaseEvent(event)
-
-    def load_font(self):
-        font_name = helpers.get_json_property(self.config_path, "fonts") or "default"  
-        font_file = os.path.join(self.fonts_path, f"{font_name}.json")
-        return helpers.get_json_property(font_file) or self.get_fallback_font()
-
-    def get_fallback_font(self):
-        return {
-            "main": {
-                "family": "Segoe UI",
-                "size": 12,
-                "weight": "normal",
-                "style": "normal", 
-                "line_height": 1.4,
-                "letter_spacing": 0,
-                "color": "#e0e0e0",
-                "fontIsDark": False
-            },
-            "monospace": {
-                "family": "Consolas", 
-                "size": 12,
-                "weight": "normal",
-                "style": "normal",
-                "line_height": 1.2,
-                "letter_spacing": 0,
-                "color": "#e0e0e0"
-            }
-        }
 
     def setup_main_app(self):
         screen = QApplication.primaryScreen()

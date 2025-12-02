@@ -168,13 +168,17 @@ def set_active_button(key):
     with open(btn_config_path, "r", encoding="utf-8") as f:
         f_readfile = f.read()
         data = json.loads(f_readfile)
-    
+
     for keyName in data:
         if keyName == 'aside_is_open': continue
         if keyName == key:
             if data[keyName] is True:
-                data['aside_is_open'] = False
-                hide_aside()
+                if data["aside_is_open"] is True:
+                    data['aside_is_open'] = False
+                    hide_aside()
+                else:
+                    data['aside_is_open'] = True
+                    show_aside()
             else:
                 data['aside_is_open'] = True
                 data[keyName] = True

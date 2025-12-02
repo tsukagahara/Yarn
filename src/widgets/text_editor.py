@@ -40,7 +40,7 @@ class textEditor(QWidget):
             QWidget {{
                 background-color: {self.bg_card};
                 border: 1px solid {self.accent_gray};
-                border-width: 0 1px;
+                border-width: 0 1px 1px 1px;
                 color: {self.text_main}
             }}
             QLabel {{

@@ -18,7 +18,8 @@ class PluginsPanel(QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
         self.setLayout(self.layout)
-        self.font = QFont("Segoe UI", 10) # TODO: current font
+        self.font = QFont("Segoe UI", 10) # TODO: current font 
+                # font-family: Unbouded;
 
         self.load_plugins()
 
