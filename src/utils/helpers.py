@@ -75,7 +75,7 @@ def replace_json_content(path_from, path_to):
     """Completely replaces contents of one JSON file with another JSON file"""
     try:
         if not os.path.exists(path_from):
-            return 'error: Source file not found'
+            log.error(msg='Source file not found')
         
         with open(path_from, 'r', encoding='utf-8') as source_file:
             data_to_copy = json.load(source_file)
@@ -83,20 +83,20 @@ def replace_json_content(path_from, path_to):
         with open(path_to, 'w', encoding='utf-8') as target_file:
             json.dump(data_to_copy, target_file, indent=2, ensure_ascii=False)
         
-        return 'success'
+        log.debug(msg='Space changed: JSON rewritten successfully')
     
     except FileNotFoundError:
-        return 'error: JSON file not found'
+        log.error(msg='JSON file not found')
     except json.JSONDecodeError as e:
-        return f'error: JSON parsing error: {e}'
+        log.error(msg=f'JSON parsing error: {e}')
     except Exception as e:
-        return f'error: File operation error: {e}'
+        log.error(msg=f'File operation error: {e}')
     
 def add_json_property(path, property, value):
     """If "property" already exists in JSON file, replaces its value; otherwise adds "property": "value" to dictionary"""
     try:
         if not property or not isinstance(property, str):
-            return 'invalid_key_name'
+            log.error(msg='invalid_key_name')
         
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -106,21 +106,21 @@ def add_json_property(path, property, value):
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
-        return 'success'
+        log.debug(msg='JSON file property added')
 
     except FileNotFoundError:
-        return 'error: JSON file not found'
+        log.error(msg='JSON file not found')
     except json.JSONDecodeError as e:
-        return f'error: JSON parsing error: {e}'
+        log.error(msg='JSON parsing error: {e}')
     except Exception as e:
-        return f'error: File operation error: {e}'
+        log.error(msg='File operation error: {e}')
     
 def remove_json_property(path, property):
     """Deletes key and its corresponding value from JSON file"""
     # TODO: Clean up unused tab paths after removal
     try:
         if not property or not isinstance(property, str):
-            return 'invalid_key_name'
+            log.error(msg='invalid_key_name')
 
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -128,7 +128,7 @@ def remove_json_property(path, property):
         if property in data:
             del data[property]
         else:
-            return 'property_not_found'
+            log.error(msg='property_not_found')
         
         for j in list(data.keys()):
             count = 0
@@ -138,14 +138,14 @@ def remove_json_property(path, property):
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
-        return 'success'
+        log.debug(msg='JSON property deleted successfully')
 
     except FileNotFoundError:
-        return 'error: JSON file not found'
+        log.error(msg='JSON file not found')
     except json.JSONDecodeError as e:
-        return f'error: JSON parsing error: {e}'
+        log.error(msg='JSON parsing error: {e}')
     except Exception as e:
-        return f'error: File operation error: {e}'
+        log.error(msg='File operation error: {e}')
 
 def save_config(path, data):
     try:
