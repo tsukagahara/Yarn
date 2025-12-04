@@ -32,6 +32,6 @@ class Yarn:
         return self.app.exec()
 
 if __name__ == "__main__":
-    log.debug('start app')
+    log.info('start app')
     yarn_app = Yarn()
     sys.exit(yarn_app.run())
